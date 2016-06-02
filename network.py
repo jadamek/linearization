@@ -32,8 +32,7 @@ class Network:
             Network.nodes[id] = process
             
     def send(self, recipient, message):
-        if Network.nodes:
-            if recipient in Network.nodes:
-                network.nodes[recipient].deliver(message)
+        if recipient in Network.nodes:
+            network.nodes[recipient].deliver(message)
 
     nodes = {}
