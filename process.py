@@ -5,6 +5,8 @@ class Process:
     def __init__(self, id):
         self.id = id
         self.channel = []
+        self.lower = -inf
+        self.higher = inf
     
     def deliver(self, message):
         self.channel.append(message)
@@ -18,6 +20,6 @@ class Process:
         Network.send(recipient, message)
     
     id = 0
-    lower = -inf
-    higher = inf
+    lower = 0
+    higher = 0
     channel = []
