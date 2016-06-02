@@ -3,7 +3,7 @@ import random
 
 class Network:
     def populate(self, population, min_id = None, max_id = None):
-        Network.nodes = []
+        Network.nodes = {}
         
         if min_id is None or max_id is None:
             min_id = 1
@@ -15,9 +15,25 @@ class Network:
             if population < max_id - min_id + 1:
                 population = max_id - min_id + 1
             
-        for i in range(population):
-            process = Process(random.randint(min_id, max_id))
+        if population < 3:
+            return False
             
-            Network.nodes.append(process)
-    
-    nodes = []
+        available_ids = range(min_id, max_id + 1)
+
+        for i in range(population):
+            id = random.choice(available_ids)
+            available_ids.pop(id)
+            
+            process = Process(id)
+            left_and_right = random.sample(range(min_id, max_id + 1) - process.id, 2)
+            process.left = left_and_right[0]
+            process.left = left_and_right[1]
+
+            Network.nodes[id] = process
+            
+    def send(self, recipient, message):
+        if Network.nodes:
+            if recipient in Network.nodes:
+                network.nodes[recipient].deliver(message)
+
+    nodes = {}
