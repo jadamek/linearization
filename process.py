@@ -5,10 +5,10 @@ class Process:
     def __init__(self, id):
         self.id = id
         self.channel = []
-        self.lower = None
-        self.higher = None
-        self.left = 0
-        self.right = 0
+        self.lower = -inf
+        self.higher = inf
+        self.left = -inf
+        self.right = inf
     
     def deliver(self, message):
         self.channel.append(message)
@@ -19,7 +19,10 @@ class Process:
         print message
         
     def send(self, recipient, message):
-        Network.send(recipient, message)
+        network.send(recipient, message)
+        
+    def __str__(self):
+        return "[id:"+str(self.id)+", l:"+str(self.lower)+", r:"+str(self.higher)+"]"
     
     id = 0
     lower = 0
@@ -27,3 +30,4 @@ class Process:
     left = 0
     right = 0
     channel = []
+    network = None
