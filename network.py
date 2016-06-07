@@ -1,41 +1,59 @@
 from process import Process
+from numpy import inf
 import random
 
+#================================================================================
 class Network:    
+#================================================================================
+# Methods
+    #----------------------------------------------------------------------------
+    # - Network Constructor
+    #----------------------------------------------------------------------------
+    # * population : number of total nodes (processes) in the Network
+    # * min_id : minimum value of the ID space
+    # * max_id : maximum value of the ID space
+    #----------------------------------------------------------------------------
     def __init__(self, population, min_id = None, max_id = None):
         self.nodes = {}
         
         if min_id is None or max_id is None:
             min_id = 1
             max_id = population
-        else:
-            if min_id > max_id:
-                min_id, max_id = max_id, min_id
-            
+        else:            
             if population > max_id - min_id + 1:
                 population = max_id - min_id + 1
             
-        if population < 3:
+        if population < 1:
             return False
             
         available_ids = range(min_id, max_id + 1)
+        id_set = random.sample(available_ids, population)
 
-        for i in range(population):
-            id = random.choice(available_ids)
-            available_ids.remove(id)
-            
+        available_ids += [-inf, inf]
+
+        for id in id_set:
             process = Process(id)
-            left_and_right = random.sample([i for i in range(min_id, max_id + 1) if i != id], 2)
+            left_and_right = random.sample([i for i in available_ids if i != id], 2)
             process.left = left_and_right[0]
-            process.lower = left_and_right[0]
             process.right = left_and_right[1]
-            process.higher = left_and_right[1]
             process.network = self
 
             self.nodes[id] = process
             
+        self.linearization = id_set + [-inf, inf]
+        self.linearization.sort()
+
+    #----------------------------------------------------------------------------
+    # - Send Message
+    #----------------------------------------------------------------------------
+    # * recipient : id of the process to deliver the message to
+    # * message : message to be delivered
+    #----------------------------------------------------------------------------
     def send(self, recipient, message):
         if recipient in self.nodes:
             self.nodes[recipient].deliver(message)
 
+# Members
     nodes = {}
+    linearization = []
+#================================================================================

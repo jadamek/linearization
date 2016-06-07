@@ -1,0 +1,62 @@
+Process
+	id
+	left
+	right
+	network_
+	actions_
+
+	send(recipient, message)
+	deliver(message)
+	receive(message)
+	act()	# choose random and return what you did
+
+Action
+	name
+	process_
+	guard()
+	command()
+
+Network
+	processes_	
+		{id : process}
+	linearized_ # solution to linearization
+		[id]
+	generate(population, min_id, max_id)
+	
+	
+Oracle
+	network_
+	uses_
+		{oracle_name : count}
+
+	+id_is_valid(id)	 # PD (participant detector)
+	+is_connected()		 # WC (weak connectivity)
+	+is_linear()		 # ?
+	+declare_right(process)  # NO: not a real oracle
+	+declare_left(process)   #
+	+discover_right(process) # CD (consequent detector)
+	+discover_left(process)  #
+
+Simulation
+	compute(fault_rate, population)
+	run(comps)
+
+	# metrics
+	Dataset stabilization_
+
+Dataset
+	data_
+		{x : y}
+	average(x)
+	stdev(x)
+	clear()
+
+Message
+	id	# only allowed content
+
+
+a forwards b to c : a sends msg<b> to c and erases b as neighbor
+a linked to b : a has msg<b> in channel, or a has b as neighbor (a->b) - directed link
+non-FIFO
+
+

@@ -1,33 +1,76 @@
 import random
 from numpy import inf
+from action import *
 
+#================================================================================
 class Process:
+#================================================================================
+# Represents a single process or network node.
+#================================================================================
+# Methods
+    #----------------------------------------------------------------------------
+    # - Process Constructor
+    #----------------------------------------------------------------------------
+    # * id : unique process id (node id) within network
+    #----------------------------------------------------------------------------
     def __init__(self, id):
         self.id = id
-        self.channel = []
-        self.lower = -inf
-        self.higher = inf
         self.left = -inf
         self.right = inf
-    
+        self.channel = []        
+        self.actions_ = []    
+
+    #----------------------------------------------------------------------------
+    # - Deliver Message
+    #----------------------------------------------------------------------------
+    # * message : message to be successfully added to process's channel and
+    #       eventually received.
+    #----------------------------------------------------------------------------
     def deliver(self, message):
         self.channel.append(message)
         
+    #----------------------------------------------------------------------------
+    # - Receive Message
+    #----------------------------------------------------------------------------
     def receive(self):
+        # Non-FIFO - randomly choose a waiting message
         message = random.choice(self.channel)
         self.channel.pop(message)
         print message
         
+    #----------------------------------------------------------------------------
+    # - Send Message
+    #----------------------------------------------------------------------------
+    # * recipient : id of the process in the network to receive the message
+    # * message : the message being sent
+    #----------------------------------------------------------------------------
     def send(self, recipient, message):
         network.send(recipient, message)
-        
+
+    #----------------------------------------------------------------------------
+    # - Execute an Enabled Action    
+    #----------------------------------------------------------------------------
+    def act(self):
+        # "Non-deterministic" action execution
+        chosen = random.choice([action for action in SYSTEM_ACTIONS if action.guard(self)])
+        chosen.command(self)
+
+        return chosen.name
+
+    #----------------------------------------------------------------------------
+    # - Represent as a String (Overload)
+    #----------------------------------------------------------------------------
     def __str__(self):
-        return "[id:"+str(self.id)+", l:"+str(self.lower)+", r:"+str(self.higher)+"]"
-    
+        return "[id:"+str(self.id)+", l:"+str(self.left)+", r:"+str(self.right)+", cl:"+str(self.declared_left)+", cr:"+str(self.declared_right)+"]"
+
+# Members    
     id = 0
-    lower = 0
-    higher = 0
     left = 0
     right = 0
+    
     channel = []
+    actions_ = []
+    declared_left = None
+    declared_right = None
     network = None
+#================================================================================
