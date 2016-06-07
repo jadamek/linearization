@@ -45,17 +45,24 @@ class Process:
     # * message : the message being sent
     #----------------------------------------------------------------------------
     def send(self, recipient, message):
-        network.send(recipient, message)
+        self.network.send(recipient, message)
 
     #----------------------------------------------------------------------------
     # - Execute an Enabled Action    
     #----------------------------------------------------------------------------
     def act(self):
         # "Non-deterministic" action execution
-        chosen = random.choice([action for action in SYSTEM_ACTIONS if action.guard(self)])
-        chosen.command(self)
+        try:
+            chosen = random.choice([action for action in ACTIONS if action.guard(self)])
+        except IndexError:
+            return None
 
+        chosen.command(self)
         return chosen.name
+
+    #----------------------------------------------------------------------------
+    #----------------------------------------------------------------------------
+
 
     #----------------------------------------------------------------------------
     # - Represent as a String (Overload)

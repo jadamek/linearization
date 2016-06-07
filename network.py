@@ -53,6 +53,16 @@ class Network:
         if recipient in self.nodes:
             self.nodes[recipient].deliver(message)
 
+    #----------------------------------------------------------------------------
+    # - Is Linearized
+    #----------------------------------------------------------------------------
+    def linearized(self):
+        for prev,cur,next in zip(self.linearization[:-2], self.linearization[1:-1], self.linearization[2:]):
+            if prev is not self.nodes[cur].declared_left: return False
+            if next is not self.nodes[cur].declared_right: return False
+            
+        return True
+
 # Members
     nodes = {}
     linearization = []

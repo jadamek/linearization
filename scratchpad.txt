@@ -22,20 +22,20 @@ Network
 	linearized_ # solution to linearization
 		[id]
 	generate(population, min_id, max_id)
+	linearized()
 	
 	
 Oracle
-	network_
 	uses_
 		{oracle_name : count}
 
-	+id_is_valid(id)	 # PD (participant detector)
-	+is_connected()		 # WC (weak connectivity)
-	+is_linear()		 # ?
-	+declare_right(process)  # NO: not a real oracle
-	+declare_left(process)   #
-	+discover_right(process) # CD (consequent detector)
-	+discover_left(process)  #
+	+id_is_valid(network, id)	# PD (participant detector)
+	+is_connected(network)		# WC (weak connectivity)
+	+declare_right(process)  	# NO: not a real oracle
+	+declare_left(process)   	#
+	+discover_right(process) 	# CD (consequent detector)
+	+discover_left(process)  	#
+	reset_usage()
 
 Simulation
 	compute(fault_rate, population)
@@ -43,13 +43,7 @@ Simulation
 
 	# metrics
 	Dataset stabilization_
-
-Dataset
-	data_
-		{x : y}
-	average(x)
-	stdev(x)
-	clear()
+	
 
 Message
 	id	# only allowed content
@@ -60,3 +54,4 @@ a linked to b : a has msg<b> in channel, or a has b as neighbor (a->b) - directe
 non-FIFO
 
 
+datasets: {x, [y]}, use numpy.mean(data[x]), numpy.std(data[x])

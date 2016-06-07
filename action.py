@@ -50,4 +50,4 @@ class ActionReceive:
     name = "receive"
 #================================================================================
 
-SYSTEM_ACTIONS = [ActionSend(), ActionReceive()]
+ACTIONS = [ActionSend(), ActionReceive()]
