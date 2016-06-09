@@ -25,17 +25,21 @@ Network
 	linearized()
 	
 	
-Oracle
+Oracles
 	uses_
 		{oracle_name : count}
+	oracles_	
 
+	reset_usage()
+	get_enabled()
+
+Oracle
 	+id_is_valid(network, id)	# PD (participant detector)
 	+is_connected(network)		# WC (weak connectivity)
 	+declare_right(process)  	# NO: not a real oracle
 	+declare_left(process)   	#
-	+discover_right(process) 	# CD (consequent detector)
-	+discover_left(process)  	#
-	reset_usage()
+	+correct_right(process) 	# CD (consequent detector)
+	+correct_left(process)  	#
 
 Simulation
 	compute(fault_rate, population)

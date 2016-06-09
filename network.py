@@ -28,21 +28,18 @@ class Network:
             
         available_ids = range(min_id, max_id + 1)
         id_set = random.sample(available_ids, population)
-
-        available_ids += [-inf, inf]
-
-        for id in id_set:
-            process = Process(id)
-            left_and_right = random.sample([i for i in available_ids if i != id], 2)
-            process.left = left_and_right[0]
-            process.right = left_and_right[1]
-            process.network = self
-
-            self.nodes[id] = process
-            
+        
         self.linearization = id_set + [-inf, inf]
         self.linearization.sort()
 
+        for prev,cur,next in zip(self.linearization[:-2], self.linearization[1:-1], self.linearization[2:]):
+            process = Process(cur)
+            process.left = prev
+            process.right = next
+            process.network = self
+
+            self.nodes[cur] = process
+                       
     #----------------------------------------------------------------------------
     # - Send Message
     #----------------------------------------------------------------------------
@@ -53,6 +50,22 @@ class Network:
         if recipient in self.nodes:
             self.nodes[recipient].deliver(message)
 
+    #----------------------------------------------------------------------------
+    # - Randomly Perturb Processes
+    #----------------------------------------------------------------------------
+    # * errors : number of processes to randomly perturb, setting an arbitrary
+    #       neighbor state.
+    #----------------------------------------------------------------------------
+    def perturb(self, errors):
+        if errors > len(self.nodes): errors = len(self.nodes)
+                
+        perturbed_ids = random.sample(self.linearization[1:-1], errors)
+
+        for id in perturbed_ids:
+            left_and_right = random.sample([i for i in self.linearization if i != id], 2)
+            self.nodes[id].left = left_and_right[0]
+            self.nodes[id].right = left_and_right[1]
+                    
     #----------------------------------------------------------------------------
     # - Is Linearized
     #----------------------------------------------------------------------------
