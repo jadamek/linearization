@@ -35,8 +35,9 @@ class Process:
     def receive(self):
         # Non-FIFO - randomly choose a waiting message
         message = random.choice(self.channel)
-        self.channel.pop(message)
-        print message
+        self.channel.remove(message)
+        
+        return message
         
     #----------------------------------------------------------------------------
     # - Send Message

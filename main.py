@@ -6,5 +6,4 @@ import random
 import action
 
 sim = Simulator()
-states = sim.run_fault_experiment([0, 100])
-sim.record_results()
+sim.run_fault_experiment([40])

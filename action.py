@@ -1,3 +1,6 @@
+from numpy import inf
+from message import Message
+
 #================================================================================
 class ActionSend:
 #================================================================================
@@ -10,7 +13,7 @@ class ActionSend:
     # * process : process to evaluate the action's guard against
     #----------------------------------------------------------------------------
     def guard(self, process):
-        return True
+        return process.left > -inf or process.right < inf
     
     #----------------------------------------------------------------------------
     # - Execute Command
@@ -18,7 +21,10 @@ class ActionSend:
     # * process : process to execute the action's commands on
     #----------------------------------------------------------------------------
     def command(self, process):
-        pass
+        if process.left > -inf:
+            process.send(process.left, Message(process.id))
+        if process.right < inf:
+            process.send(process.right, Message(process.id))            
 
 # Members
     name = "send"
@@ -44,7 +50,22 @@ class ActionReceive:
     # * process : process to execute the action's commands on
     #----------------------------------------------------------------------------
     def command(self, process):
-        pass
+        message = process.receive()
+        
+        if message.content > process.id:
+            if message.content < process.right:
+                if process.right < inf:
+                    process.send(message.content, Message(process.right))
+                process.right = message.content
+            else:
+                process.send(process.right, message)
+        elif message.content < process.id:
+            if message.content > process.left:
+                if process.left > -inf:
+                    process.send(message.content, Message(process.left))
+                process.left = message.content
+            else:
+                process.send(process.left, message)
 
 # Members
     name = "receive"

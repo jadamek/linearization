@@ -16,7 +16,7 @@ class OracleWC:
     # * network : network to evaluate the oracles's action's guard against
     #----------------------------------------------------------------------------
     def guard(self, network):
-        return True
+        return False
     
     #----------------------------------------------------------------------------
     # - Execute Command
@@ -50,7 +50,12 @@ class OraclePD:
     # * network : network to evaluate the oracles's action's guard against
     #----------------------------------------------------------------------------
     def guard(self, network):
-        return True
+        for pid in network.nodes:
+            if network.nodes[pid].left not in network.linearization:
+                return True
+            if network.nodes[pid].right not in network.linearization:
+                return True
+        return False
     
     #----------------------------------------------------------------------------
     # - Execute Command
@@ -58,6 +63,13 @@ class OraclePD:
     # * network : network to execute the oracle's action on
     #----------------------------------------------------------------------------
     def command(self, network):
+        for pid in network.nodes:
+            if network.nodes[pid].left not in network.linearization:
+                network.nodes[pid].left = -inf
+                break
+            if network.nodes[pid].right not in network.linearization:
+                network.nodes[pid].right = inf
+                break
         self.executions += 1
 
 # Members
@@ -84,7 +96,13 @@ class OracleNO:
     # * network : network to evaluate the oracles's action's guard against
     #----------------------------------------------------------------------------
     def guard(self, network):
-        return True
+        for pid in network.nodes:
+            if network.nodes[pid].left != network.nodes[pid].declared_left:
+                return True
+            if network.nodes[pid].right != network.nodes[pid].declared_right:
+                return True
+            
+        return False
     
     #----------------------------------------------------------------------------
     # - Execute Command
@@ -92,6 +110,13 @@ class OracleNO:
     # * network : network to execute the oracle's action on
     #----------------------------------------------------------------------------
     def command(self, network):
+        for pid in network.nodes:
+            if network.nodes[pid].left != network.nodes[pid].declared_left:
+                network.nodes[pid].declared_left = network.nodes[pid].left
+                break
+            if network.nodes[pid].right != network.nodes[pid].declared_right:
+                network.nodes[pid].declared_right = network.nodes[pid].right
+                break
         self.executions += 1
 
 # Members
@@ -118,7 +143,12 @@ class OracleCD:
     # * network : network to evaluate the oracles's action's guard against
     #----------------------------------------------------------------------------
     def guard(self, network):
-        return True
+        for pid in network.nodes:
+            if network.nodes[pid].left != network.nodes[pid].declared_left and network.nodes[pid].left is network.linearization[network.linearization.index(pid) - 1]:
+                return True
+            if network.nodes[pid].right != network.nodes[pid].declared_right and network.nodes[pid].right is network.linearization[network.linearization.index(pid) + 1]:
+                return True
+        return False
     
     #----------------------------------------------------------------------------
     # - Execute Command
@@ -126,6 +156,13 @@ class OracleCD:
     # * network : network to execute the oracle's action on
     #----------------------------------------------------------------------------
     def command(self, network):
+        for pid in network.nodes:
+            if network.nodes[pid].left != network.nodes[pid].declared_left and network.nodes[pid].left is network.linearization[network.linearization.index(pid) - 1]:
+                network.nodes[pid].declared_left = network.nodes[pid].left
+                break
+            if network.nodes[pid].right != network.nodes[pid].declared_right and network.nodes[pid].right is network.linearization[network.linearization.index(pid) + 1]:
+                network.nodes[pid].declared_right = network.nodes[pid].right
+                break
         self.executions += 1
 
 # Members

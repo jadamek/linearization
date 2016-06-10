@@ -24,6 +24,17 @@ class Simulator:
 
         actions = [oracle for oracle in oracles if oracle.guard(network)] + ["node"]
 
+        # Print block
+        print "Initial state:"
+        print "--Network--"
+        for process in network.nodes:
+            channel = "["
+            for message in network.nodes[process].channel:
+                channel += str(message) + " "
+            channel += "]"
+            print network.nodes[process], "\tch:", channel
+        print "-----------"
+    
         while not network.linearized() and state < 10:
             state += 1
             # Select an action
@@ -36,6 +47,16 @@ class Simulator:
             else:
                 action_type.command(network)
                 print "s"+str(state), ":", action_type.name, "executes its action"
+
+            # Print block
+            print "--Network--"
+            for process in network.nodes:
+                channel = "["
+                for message in network.nodes[process].channel:
+                    channel += str(message) + " "
+                channel += "]"
+                print network.nodes[process], "\tch:", channel
+            print "-----------"
 
         return state, oracles[0].executions, oracles[3].executions
 
