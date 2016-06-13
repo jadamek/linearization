@@ -1,3 +1,7 @@
+from numpy import inf
+from message import Message
+import random
+
 #================================================================================
 class OracleWC:
 #================================================================================
@@ -16,7 +20,19 @@ class OracleWC:
     # * network : network to evaluate the oracles's action's guard against
     #----------------------------------------------------------------------------
     def guard(self, network):
-        return False
+        remaining = set(network.nodes.keys())
+        component = self.compute_component(network.nodes[1].id, set([]), remaining, network)
+        
+        matched = True
+        while matched:
+            matched = False
+            for id in remaining:
+                if network.nodes[id].left in component or network.nodes[id].right in component or len(component.intersection(set([message.content for message in network.nodes[id].channel]))) > 0:
+                    self.compute_component(id, component, remaining, network)
+                    matched = True
+                    break
+
+        return len(remaining) > 0
     
     #----------------------------------------------------------------------------
     # - Execute Command
@@ -24,8 +40,47 @@ class OracleWC:
     # * network : network to execute the oracle's action on
     #----------------------------------------------------------------------------
     def command(self, network):
+        remaining = set(network.nodes.keys())
+        component = self.compute_component(network.nodes[1].id, set([]), remaining, network)
+        
+        matched = True
+        while matched:
+            matched = False
+            for id in remaining:
+                if network.nodes[id].left in component or network.nodes[id].right in component or len(component.intersection(set([message.content for message in network.nodes[id].channel]))) > 0:
+                    self.compute_component(id, component, remaining, network)
+                    matched = True
+                    break
+
+        icebreaker = random.choice(tuple(component))
+        network.nodes[icebreaker].send(random.choice(tuple(remaining)), Message(icebreaker))
+
         self.executions += 1
 
+    #----------------------------------------------------------------------------
+    # - Compute Forward Component (private)
+    #----------------------------------------------------------------------------
+    # * id : the ID of the current process being discovered in the component
+    # * component : list of processes that belong to the current component
+    # * remaining : list of processes that do not yet belong to the component
+    # * network : network this component belongs to
+    #----------------------------------------------------------------------------
+    def compute_component(self, id, component, remaining, network):        
+        process = network.nodes[id]
+        component.add(id)
+        remaining.remove(id)
+
+        if process.left not in component | set([-inf, inf]):
+            self.compute_component(process.left, component, remaining, network)
+        if process.right not in component | set([-inf, inf]):
+            self.compute_component(process.right, component, remaining, network)
+
+        for message in process.channel:
+            if message.content not in component | set([-inf, inf]):
+                self.compute_component(message.content, component, remaining, network)
+
+        return component
+        
 # Members
     name = "WC"
     executions = 0

@@ -35,7 +35,9 @@ class Network:
         for prev,cur,next in zip(self.linearization[:-2], self.linearization[1:-1], self.linearization[2:]):
             process = Process(cur)
             process.left = prev
+            process.declared_left = prev
             process.right = next
+            process.declared_right = next
             process.network = self
 
             self.nodes[cur] = process
@@ -62,17 +64,16 @@ class Network:
         perturbed_ids = random.sample(self.linearization[1:-1], errors)
 
         for id in perturbed_ids:
-            left_and_right = random.sample([i for i in self.linearization if i != id], 2)
-            self.nodes[id].left = left_and_right[0]
-            self.nodes[id].right = left_and_right[1]
+            self.nodes[id].left = random.choice([i for i in self.linearization if i < id])
+            self.nodes[id].right = random.choice([i for i in self.linearization if i > id])
                     
     #----------------------------------------------------------------------------
     # - Is Linearized
     #----------------------------------------------------------------------------
     def linearized(self):
         for prev,cur,next in zip(self.linearization[:-2], self.linearization[1:-1], self.linearization[2:]):
-            if prev is not self.nodes[cur].declared_left: return False
-            if next is not self.nodes[cur].declared_right: return False
+            if prev is not self.nodes[cur].left: return False
+            if next is not self.nodes[cur].right: return False
             
         return True
 
