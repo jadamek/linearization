@@ -17,12 +17,11 @@ class Simulator:
     #----------------------------------------------------------------------------
     def compute(self, faults, population):
         state = 0
+        queue_lengths = 0.0
 
         network = Network(population)
         network.perturb(faults)
         oracles = get_oracles()
-
-        actions = [oracle for oracle in oracles if oracle.guard(network)] + ["node"]
 
         # Print block
         print "Initial state:"
@@ -35,9 +34,11 @@ class Simulator:
             print network.nodes[process], "\tch:", channel
         print "-----------"
     
-        while not network.linearized() and state < 10:
+        while not network.linearized():
+            queue_lengths += numpy.mean([len(network.nodes[id].channel) for id in network.nodes])
             state += 1
             # Select an action
+            actions = [oracle for oracle in oracles if oracle.guard(network)] + ["node"]
             action_type = random.choice(actions)
 
             if action_type is "node":
@@ -58,7 +59,7 @@ class Simulator:
                 print network.nodes[process], "\tch:", channel
             print "-----------"
 
-        return state, oracles[0].executions, oracles[3].executions
+        return state, oracles[0].executions, oracles[3].executions, queue_lengths / max(state, 1)
 
     #----------------------------------------------------------------------------
     # - Run A Fault-Dependent Experiment
@@ -69,17 +70,22 @@ class Simulator:
     def run_fault_experiment(self, fault_rates, computations = 1, population = 5):
         self.experiment = "fault"
         self.speed = {}
+        self.wc_calls = {}
+        self.cd_calls = {}
+        self.queue_length = {}
 
         for rate in fault_rates:
             self.speed[rate] = []
             self.wc_calls[rate] = []
             self.cd_calls[rate] = []
+            self.queue_length[rate] = []
 
             for comp in range(computations):
-                speed, wc_calls, cd_calls = self.compute(int(population * rate), population)
+                speed, wc_calls, cd_calls, queue_length = self.compute(int(population * rate), population)
                 self.speed[rate].append(speed)
                 self.wc_calls[rate].append(wc_calls)
                 self.cd_calls[rate].append(cd_calls)
+                self.queue_length[rate].append(queue_length)
 
     #----------------------------------------------------------------------------
     # - Output Results
@@ -91,10 +97,12 @@ class Simulator:
         print "stabilization speed:", self.speed
         print 'calls to WC Oracle:', self.wc_calls
         print "calls to CD Oracle:", self.cd_calls
+        print "average queue length:", self.queue_length
 
 # Members
     wc_calls = {}
     cd_calls = {}
     speed = {}
+    queue_length = {}
     experiment = ""
 #================================================================================

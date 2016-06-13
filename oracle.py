@@ -31,7 +31,7 @@ class OracleWC:
                     self.compute_component(id, component, remaining, network)
                     matched = True
                     break
-
+        #print "WC_guard, remaining:", remaining
         return len(remaining) > 0
     
     #----------------------------------------------------------------------------
@@ -52,6 +52,8 @@ class OracleWC:
                     matched = True
                     break
 
+        #print "WC_command, component:", component
+        #print "WC_command, remaining:", remaining
         icebreaker = random.choice(tuple(component))
         network.nodes[icebreaker].send(random.choice(tuple(remaining)), Message(icebreaker))
 
