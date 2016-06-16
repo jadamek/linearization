@@ -13,7 +13,7 @@ class ActionSend:
     # * process : process to evaluate the action's guard against
     #----------------------------------------------------------------------------
     def guard(self, process):
-        return process.left > -inf or process.right < inf
+        return (process.left > -inf or process.right < inf) and len(process.channel) is 0
     
     #----------------------------------------------------------------------------
     # - Execute Command

@@ -62,8 +62,10 @@ class Process:
         return chosen.name
 
     #----------------------------------------------------------------------------
+    # - An Action is Enabled
     #----------------------------------------------------------------------------
-
+    def enabled(self):
+        return any([action.guard(self) for action in ACTIONS])
 
     #----------------------------------------------------------------------------
     # - Represent as a String (Overload)
