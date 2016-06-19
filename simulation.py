@@ -89,7 +89,7 @@ class Simulator:
             self.channel_length[rate] = []
 
             for comp in range(computations):
-                speed, wc_calls, cd_calls, channel_length = self.compute(int(population * rate), population)
+                speed, wc_calls, cd_calls, channel_length = self.compute(int(population * rate / 100), population)
                 self.speed[rate].append(speed)
                 self.wc_calls[rate].append(wc_calls)
                 self.cd_calls[rate].append(cd_calls)
