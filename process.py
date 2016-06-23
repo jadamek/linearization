@@ -17,8 +17,9 @@ class Process:
         self.id = id
         self.left = -inf
         self.right = inf
-        self.channel = []        
-        self.actions_ = []    
+        self.channel = []
+        self.outgoing = []    
+        self.actions_ = []   
 
     #----------------------------------------------------------------------------
     # - Deliver Message
@@ -36,6 +37,7 @@ class Process:
         # Non-FIFO - randomly choose a waiting message
         message = random.choice(self.channel)
         self.channel.remove(message)
+        message.sender.outgoing.remove(message)
         
         return message
         
@@ -46,8 +48,9 @@ class Process:
     # * message : the message being sent
     #----------------------------------------------------------------------------
     def send(self, recipient, message):
+        message.sender = self
         self.network.send(recipient, message)
-
+        self.outgoing.append(message)
     #----------------------------------------------------------------------------
     # - Execute an Enabled Action    
     #----------------------------------------------------------------------------
@@ -79,6 +82,7 @@ class Process:
     right = 0
     
     channel = []
+    outgoing = []
     actions_ = []
     declared_left = None
     declared_right = None
