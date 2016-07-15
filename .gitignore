@@ -1,3 +1,16 @@
 *.txt
 *.pyc
 *.xlsx
+*.dat
+*.eps
+*.pdf
+*.bib
+*.log
+*.plt
+*.cls
+*.bbl
+*.aux
+*.blg
+*.tex
+*.synctex.gz
+*.zip
