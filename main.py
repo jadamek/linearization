@@ -7,9 +7,12 @@ import random
 import action
 import time
 
+
 start = time.clock()
 sim = Simulator()
-sim.run_fault_experiment(range(1, 11), 10, 100)
+sim.run_fault_experiment([10], 1, 100)
 end = time.clock()
+
+
 print "Experiment finished! (", end - start, "s)"
-sim.record_results("Linear-results-faults_1-10.txt", range(1, 11))
+sim.record_results("Linear-results-faults_1-10.txt", [10])

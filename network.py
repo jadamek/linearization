@@ -1,7 +1,7 @@
 from process import Process
 from numpy import inf
 import random
-
+import sys
 #================================================================================
 class Network:    
 #================================================================================
@@ -16,7 +16,7 @@ class Network:
     def __init__(self, population, min_id = None, max_id = None):
         self.nodes = {}
         
-        if min_id is None or max_id is None:
+        if min_id == None or max_id == None:
             min_id = 1
             max_id = population
         else:            
@@ -25,6 +25,9 @@ class Network:
             
         if population < 1:
             return False
+
+        self.min_id = min_id
+        self.max_id = max_id
             
         available_ids = range(min_id, max_id + 1)
         id_set = random.sample(available_ids, population)
@@ -62,22 +65,32 @@ class Network:
         if errors > len(self.nodes): errors = len(self.nodes)
                 
         perturbed_ids = random.sample(self.linearization[1:-1], errors)
-
+        
         for id in perturbed_ids:
-            self.nodes[id].left = random.choice([i for i in self.linearization if i < id])
-            self.nodes[id].right = random.choice([i for i in self.linearization if i > id])
-                    
+            # Real IDs Only
+            #self.nodes[id].left = random.choice([i for i in self.linearization if i < id])
+            #self.nodes[id].right = random.choice([i for i in self.linearization if i > id])
+
+            # Fake IDs        
+            self.nodes[id].left = random.choice(range(self.min_id, id) + [-inf])
+            self.nodes[id].right = random.choice(range(id + 1, self.max_id) + [inf])
+            #print "perturbed %f with l:%f and r:%f" % (id, self.nodes[id].left, self.nodes[id].right)
+            #sys.stdout.flush()
     #----------------------------------------------------------------------------
     # - Is Linearized
     #----------------------------------------------------------------------------
     def linearized(self):
-        for prev,cur,next in zip(self.linearization[:-2], self.linearization[1:-1], self.linearization[2:]):
-            if prev is not self.nodes[cur].left or prev is not self.nodes[cur].declared_left: return False
-            if next is not self.nodes[cur].right or next is not self.nodes[cur].declared_right: return False
+        for i in range(1, len(self.linearization) - 1):
+            if self.nodes[self.linearization[i]].left != self.linearization[i - 1]:
+                return False
+            if self.nodes[self.linearization[i]].right != self.linearization[i + 1]:
+                return False
             
         return True
 
 # Members
     nodes = {}
     linearization = []
+    min_id = 0
+    max_id = 1
 #================================================================================

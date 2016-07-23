@@ -21,8 +21,8 @@ class OracleWC:
     #----------------------------------------------------------------------------
     def guard(self, network):
         remaining = set(network.nodes.keys())
-        component = self.compute_component(network.nodes[1].id, set([]), remaining, network)
-        
+        component = self.compute_component(network.nodes.keys()[0], set([]), remaining, network)
+                
         matched = True
         while matched:
             matched = False
@@ -31,6 +31,7 @@ class OracleWC:
                     self.compute_component(id, component, remaining, network)
                     matched = True
                     break
+        
         #print "WC_guard, remaining:", remaining
         return len(remaining) > 0
     
@@ -41,7 +42,7 @@ class OracleWC:
     #----------------------------------------------------------------------------
     def command(self, network):
         remaining = set(network.nodes.keys())
-        component = self.compute_component(network.nodes[1].id, set([]), remaining, network)
+        component = self.compute_component(network.nodes.keys()[0], set([]), remaining, network)
         
         matched = True
         while matched:
@@ -72,13 +73,13 @@ class OracleWC:
         component.add(id)
         remaining.remove(id)
 
-        if process.left not in component | set([-inf, inf]):
+        if process.left in network.nodes.keys() and process.left not in component:
             self.compute_component(process.left, component, remaining, network)
-        if process.right not in component | set([-inf, inf]):
+        if process.right in network.nodes.keys() and process.right not in component:
             self.compute_component(process.right, component, remaining, network)
 
         for message in process.channel:
-            if message.content not in component | set([-inf, inf]):
+            if message.content in network.nodes.keys() and message.content not in component:
                 self.compute_component(message.content, component, remaining, network)
 
         return component
@@ -87,7 +88,7 @@ class OracleWC:
     name = "WC"
     executions = 0
 #================================================================================
-
+import sys
 #================================================================================
 class OraclePD:
 #================================================================================
@@ -201,9 +202,9 @@ class OracleCD:
     #----------------------------------------------------------------------------
     def guard(self, network):
         for pid in network.nodes:
-            if network.nodes[pid].left != network.nodes[pid].declared_left and network.nodes[pid].left is network.linearization[network.linearization.index(pid) - 1]:
+            if network.nodes[pid].left != network.nodes[pid].declared_left and network.nodes[pid].left == network.linearization[network.linearization.index(pid) - 1]:
                 return True
-            if network.nodes[pid].right != network.nodes[pid].declared_right and network.nodes[pid].right is network.linearization[network.linearization.index(pid) + 1]:
+            if network.nodes[pid].right != network.nodes[pid].declared_right and network.nodes[pid].right == network.linearization[network.linearization.index(pid) + 1]:
                 return True
         return False
     
@@ -214,10 +215,10 @@ class OracleCD:
     #----------------------------------------------------------------------------
     def command(self, network):
         for pid in network.nodes:
-            if network.nodes[pid].left != network.nodes[pid].declared_left and network.nodes[pid].left is network.linearization[network.linearization.index(pid) - 1]:
+            if network.nodes[pid].left != network.nodes[pid].declared_left and network.nodes[pid].left == network.linearization[network.linearization.index(pid) - 1]:
                 network.nodes[pid].declared_left = network.nodes[pid].left
                 break
-            if network.nodes[pid].right != network.nodes[pid].declared_right and network.nodes[pid].right is network.linearization[network.linearization.index(pid) + 1]:
+            if network.nodes[pid].right != network.nodes[pid].declared_right and network.nodes[pid].right == network.linearization[network.linearization.index(pid) + 1]:
                 network.nodes[pid].declared_right = network.nodes[pid].right
                 break
         self.executions += 1
