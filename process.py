@@ -49,8 +49,8 @@ class Process:
     #----------------------------------------------------------------------------
     def send(self, recipient, message):
         message.sender = self
-        self.network.send(recipient, message)
-        self.outgoing.append(message)
+        if self.network.send(recipient, message):
+            self.outgoing.append(message)
     #----------------------------------------------------------------------------
     # - Execute an Enabled Action    
     #----------------------------------------------------------------------------
