@@ -50,10 +50,15 @@ class Network:
     #----------------------------------------------------------------------------
     # * recipient : id of the process to deliver the message to
     # * message : message to be delivered
+    # Returns True if the message was successfully sent to a real node, and False
+    # otherwise.
     #----------------------------------------------------------------------------
     def send(self, recipient, message):
         if recipient in self.nodes:
             self.nodes[recipient].deliver(message)
+            return True
+        return False
+            
 
     #----------------------------------------------------------------------------
     # - Randomly Perturb Processes
