@@ -16,7 +16,10 @@ class Simulator:
     # * population : number of total processes in the network
     #----------------------------------------------------------------------------
     def compute(self, faults, population):
-        #log = open("logs/trace.txt", 'w')
+        keep_log = False
+        if keep_log:
+            log = open("logs/trace.txt", 'w')
+
         state = 0
 
         channel_lengths = 0.0
@@ -26,69 +29,8 @@ class Simulator:
         oracles = get_oracles()
 
         # Print block
-        """        
-        log.write("Initial state:\n")
-        log.write("--Network--\n")
-        for process in network.nodes:
-            channel = "["
-            for message in network.nodes[process].channel:
-                channel += str(message) + " "
-            channel += "]"
-            log.write(str(network.nodes[process]))
-            log.write("\tch:")
-            log.write(str(channel))
-            log.write("\n")
-        log.write("-----------\n")
-        
-        
-        print "Initial state:"
-        print "--Network--"
-        for process in network.nodes:
-            channel = "["
-            for message in network.nodes[process].channel:
-                channel += str(message) + " "
-            channel += "]"
-            print network.nodes[process], "\tch:", channel
-        print "-----------"
-        """
-        while not network.linearized():
-            channel_lengths += numpy.mean([len(network.nodes[id].channel) for id in network.nodes])
-            state += 1
-
-            enabled = [network.nodes[id] for id in network.nodes if network.nodes[id].enabled()]
-
-            # Select an action
-            actions = [oracle for oracle in oracles if oracle.guard(network)]
-            if len(enabled) > 0: actions += ["node"]
-            chosen_action = random.choice(actions)
-            
-            #for oracle in oracles:
-            #    log.write(oracle.name + ": " + str(oracle.guard(network)) + " ")
-            #log.write("\n")
-            
-            if chosen_action == "node":
-                actor = random.choice(enabled)
-                action = actor.act()
-                #log.write("s")
-                #log.write(str(state))
-                #log.write(": p")
-                #log.write(str(actor.id))
-                #log.write(" executes ")
-                #log.write(str(action))
-                #log.write("\n")
-            else:
-                chosen_action.command(network)
-                #log.write("s")
-                #log.write(str(state))
-                #log.write(": ")
-                #log.write(str(chosen_action.name))
-                #log.write(" executes its action")
-                #log.write("\n")
-                #print "s"+str(state), ":", chosen_action.name, "executes its action"
-                #print "s"+str(state), ":", chosen_action.name, "executes its action"
-
-            # Print block
-            """            
+        if keep_log:       
+            log.write("Initial state:\n")
             log.write("--Network--\n")
             for process in network.nodes:
                 channel = "["
@@ -100,7 +42,73 @@ class Simulator:
                 log.write(str(channel))
                 log.write("\n")
             log.write("-----------\n")
+        
+        """
+        print "Initial state:"
+        print "--Network--"
+        for process in network.nodes:
+            channel = "["
+            for message in network.nodes[process].channel:
+                channel += str(message) + " "
+            channel += "]"
+            print network.nodes[process], "\tch:", channel
+        print "-----------"
+        """
+        while not network.linearized():
+            print 's',state
+            channel_lengths += numpy.mean([len(network.nodes[id].channel) for id in network.nodes])
+            state += 1
+
+            enabled = [network.nodes[id] for id in network.nodes if network.nodes[id].enabled()]
+
+            # Select an action
+            actions = [oracle for oracle in oracles if oracle.guard(network)]
+            if len(enabled) > 0: actions += ["node"]
+            chosen_action = random.choice(actions)
             
+            if keep_log:
+                for oracle in oracles:
+                    log.write(oracle.name + ": " + str(oracle.guard(network)) + " ")
+                log.write("\n")
+            
+            if chosen_action == "node":
+                actor = random.choice(enabled)
+                action = actor.act()
+                
+                if keep_log:
+                    log.write("s")
+                    log.write(str(state))
+                    log.write(": p")
+                    log.write(str(actor.id))
+                    log.write(" executes ")
+                    log.write(str(action))
+                    log.write("\n")
+            else:
+                chosen_action.command(network)
+                if keep_log:
+                    log.write("s")
+                    log.write(str(state))
+                    log.write(": ")
+                    log.write(str(chosen_action.name))
+                    log.write(" executes its action")
+                    log.write("\n")
+                    #print "s"+str(state), ":", chosen_action.name, "executes its action"
+                    #print "s"+str(state), ":", chosen_action.name, "executes its action"
+
+            # Print block
+            if keep_log:
+                log.write("--Network--\n")
+                for process in network.nodes:
+                    channel = "["
+                    for message in network.nodes[process].channel:
+                        channel += str(message) + " "
+                    channel += "]"
+                    log.write(str(network.nodes[process]))
+                    log.write("\tch:")
+                    log.write(str(channel))
+                    log.write("\n")
+                log.write("-----------\n")
+            """
             print "--Network--"
             for process in network.nodes:
                 channel = "["
